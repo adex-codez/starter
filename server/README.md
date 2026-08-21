@@ -53,7 +53,7 @@ Go backend starter using Gin, PostgreSQL, sqlc, Air, and Goose.
    ./scripts/run.sh
    ```
 
-The API listens on `http://localhost:8080` by default. The process handles `SIGINT` and `SIGTERM` and drains active HTTP requests before exiting.
+The API listens on `http://localhost:8080` by default. The process handles `SIGINT` and `SIGTERM` and drains active HTTP requests before exiting. Startup and shutdown use a 10-second timeout by default.
 
 ## Health check
 
@@ -68,6 +68,8 @@ Expected response:
 ```
 
 `/health` checks that the process is running. `/ready` checks PostgreSQL and returns HTTP `503` if the application cannot reach it.
+
+If a `ServerConfig` is constructed without timeout values, the server falls back to a 10-second shutdown timeout. The application entrypoint also restores the 10-second startup timeout before connecting to PostgreSQL.
 
 ## Tasks
 

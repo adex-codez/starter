@@ -7,7 +7,26 @@ param(
     [string]$Name
 )
 
-$scriptsDir = Join-Path $PSScriptRoot "scripts"
+$serverDir = Join-Path $PSScriptRoot "server"
+$scriptsDir = Join-Path $serverDir "scripts"
+
+function Invoke-ServerTask {
+    param(
+        [string]$Script,
+        [hashtable]$Parameters = @{}
+    )
+
+    Push-Location $serverDir
+    try {
+        & (Join-Path $scriptsDir $Script) @Parameters
+        if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+        }
+    }
+    finally {
+        Pop-Location
+    }
+}
 
 function Show-Help {
     Write-Host @"
@@ -32,14 +51,14 @@ Examples:
 }
 
 switch ($Task) {
-    "build"          { & "$scriptsDir\build.ps1" }
-    "run"            { & "$scriptsDir\run.ps1" }
-    "dev"            { & "$scriptsDir\dev.ps1" }
-    "migrate-new"    { & "$scriptsDir\migrate-new.ps1" -Name $Name }
-    "migrate-up"     { & "$scriptsDir\migrate-up.ps1" }
-    "migrate-down"   { & "$scriptsDir\migrate-down.ps1" }
-    "migrate-status" { & "$scriptsDir\migrate-status.ps1" }
-    "generate"       { & "$scriptsDir\generate.ps1" }
-    "tidy"           { & "$scriptsDir\tidy.ps1" }
+    "build"          { Invoke-ServerTask "build.ps1" }
+    "run"            { Invoke-ServerTask "run.ps1" }
+    "dev"            { Invoke-ServerTask "dev.ps1" }
+    "migrate-new"    { Invoke-ServerTask "migrate-new.ps1" @{ Name = $Name } }
+    "migrate-up"     { Invoke-ServerTask "migrate-up.ps1" }
+    "migrate-down"   { Invoke-ServerTask "migrate-down.ps1" }
+    "migrate-status" { Invoke-ServerTask "migrate-status.ps1" }
+    "generate"       { Invoke-ServerTask "generate.ps1" }
+    "tidy"           { Invoke-ServerTask "tidy.ps1" }
     default           { Show-Help }
 }

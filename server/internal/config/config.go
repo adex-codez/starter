@@ -26,6 +26,11 @@ type DatabaseConfig struct {
 	URL string
 }
 
+const (
+	DefaultStartupTimeout  = 10 * time.Second
+	DefaultShutdownTimeout = 10 * time.Second
+)
+
 func Load() (Config, error) {
 	_ = godotenv.Load()
 
@@ -61,8 +66,8 @@ func Load() (Config, error) {
 			Host:            host,
 			Port:            port,
 			Mode:            mode,
-			StartupTimeout:  10 * time.Second,
-			ShutdownTimeout: 10 * time.Second,
+			StartupTimeout:  DefaultStartupTimeout,
+			ShutdownTimeout: DefaultShutdownTimeout,
 		},
 		Database: DatabaseConfig{URL: databaseURL},
 	}, nil

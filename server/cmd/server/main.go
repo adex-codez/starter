@@ -22,6 +22,12 @@ func main() {
 		slog.Error("failed to load config", "error", err)
 		os.Exit(1)
 	}
+	if cfg.Server.StartupTimeout <= 0 {
+		cfg.Server.StartupTimeout = config.DefaultStartupTimeout
+	}
+	if cfg.Server.ShutdownTimeout <= 0 {
+		cfg.Server.ShutdownTimeout = config.DefaultShutdownTimeout
+	}
 
 	startupCtx, cancel := context.WithTimeout(context.Background(), cfg.Server.StartupTimeout)
 	defer cancel()

@@ -13,6 +13,10 @@ type Server struct {
 }
 
 func New(address string, handler http.Handler, shutdownTimeout time.Duration) *Server {
+	if shutdownTimeout <= 0 {
+		shutdownTimeout = 10 * time.Second
+	}
+
 	return &Server{
 		httpServer: &http.Server{
 			Addr:              address,
