@@ -1,19 +1,15 @@
 package router
 
 import (
-	"context"
-
 	"backend/internal/config"
 	"backend/internal/handler"
 	"backend/internal/middleware"
+	"backend/internal/repository"
+	"backend/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
-type pinger interface {
-	Ping(context.Context) error
-}
-
-func New(db pinger, cfg config.ServerConfig) (*gin.Engine, error) {
+func New(db repository.HealthRepository, cfg config.ServerConfig) (*gin.Engine, error) {
 	gin.SetMode(cfg.Mode)
 
 	router := gin.New()
@@ -22,9 +18,10 @@ func New(db pinger, cfg config.ServerConfig) (*gin.Engine, error) {
 	}
 	router.Use(middleware.Recovery(), middleware.Logger())
 
-	health := handler.NewHealthHandler(db)
-	router.GET("/health", health.Live)
-	router.GET("/ready", health.Ready)
+	healthService := service.NewHealthService(db)
+	h := handler.NewHealthHandler(healthService)
+	router.GET("/health", h.Live)
+	router.GET("/ready", h.Ready)
 
 	return router, nil
 }

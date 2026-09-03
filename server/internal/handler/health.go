@@ -4,30 +4,34 @@ import (
 	"context"
 	"net/http"
 
+	"backend/internal/response"
+	"backend/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
-type pinger interface {
-	Ping(context.Context) error
+type healthService interface {
+	Live() service.HealthStatus
+	Ready(context.Context) (service.HealthStatus, error)
 }
 
 type HealthHandler struct {
-	db pinger
+	service healthService
 }
 
-func NewHealthHandler(db pinger) *HealthHandler {
-	return &HealthHandler{db: db}
+func NewHealthHandler(svc healthService) *HealthHandler {
+	return &HealthHandler{service: svc}
 }
 
 func (h *HealthHandler) Live(c *gin.Context) {
-	Success(c, gin.H{"status": "ok"})
+	response.Success(c, h.service.Live())
 }
 
 func (h *HealthHandler) Ready(c *gin.Context) {
-	if err := h.db.Ping(c.Request.Context()); err != nil {
-		Error(c, http.StatusServiceUnavailable, "service unavailable")
+	status, err := h.service.Ready(c.Request.Context())
+	if err != nil {
+		response.Error(c, http.StatusServiceUnavailable, "service unavailable")
 		return
 	}
 
-	Success(c, gin.H{"status": "ready", "database": "ok"})
+	response.Success(c, status)
 }

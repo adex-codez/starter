@@ -55,6 +55,21 @@ Go backend starter using Gin, PostgreSQL, sqlc, Air, and Goose.
 
 The API listens on `http://localhost:8080` by default. The process handles `SIGINT` and `SIGTERM` and drains active HTTP requests before exiting. Startup and shutdown use a 10-second timeout by default.
 
+## Server structure
+
+The server uses a handler, service, and repository structure:
+
+```text
+cmd/server             application composition and process lifecycle
+internal/handler       HTTP transport and response mapping
+internal/service       application behavior and use cases
+internal/repository    persistence interfaces and database adapters
+internal/database      database connection setup and generated SQL code
+internal/router         route registration and middleware setup
+```
+
+Dependencies flow from handler to service to repository. The composition point wires concrete adapters together, which keeps HTTP code independent of PostgreSQL and makes each layer replaceable in tests.
+
 ## Health check
 
 ```sh

@@ -6,20 +6,26 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"backend/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
-type fakePinger struct {
-	err error
+type fakeHealthService struct {
+	readyStatus service.HealthStatus
+	readyErr    error
 }
 
-func (p fakePinger) Ping(context.Context) error {
-	return p.err
+func (s fakeHealthService) Live() service.HealthStatus {
+	return service.HealthStatus{Status: "ok"}
+}
+
+func (s fakeHealthService) Ready(context.Context) (service.HealthStatus, error) {
+	return s.readyStatus, s.readyErr
 }
 
 func TestHealthHandlerLive(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	handler := NewHealthHandler(fakePinger{})
+	handler := NewHealthHandler(fakeHealthService{})
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
 	ctx.Request = httptest.NewRequest(http.MethodGet, "/health", nil)
@@ -33,7 +39,7 @@ func TestHealthHandlerLive(t *testing.T) {
 
 func TestHealthHandlerReadyWhenDatabaseIsUnavailable(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	handler := NewHealthHandler(fakePinger{err: context.Canceled})
+	handler := NewHealthHandler(fakeHealthService{readyErr: context.Canceled})
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
 	ctx.Request = httptest.NewRequest(http.MethodGet, "/ready", nil)

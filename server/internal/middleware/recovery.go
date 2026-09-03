@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"backend/internal/handler"
+	"backend/internal/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +18,7 @@ func Recovery() gin.HandlerFunc {
 					"stack", string(debug.Stack()),
 				)
 				c.Abort()
-				handler.Error(c, http.StatusInternalServerError, "internal server error")
+				response.Error(c, http.StatusInternalServerError, "internal server error")
 			}
 		}()
 
