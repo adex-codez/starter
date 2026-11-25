@@ -31,8 +31,13 @@ const (
 	DefaultShutdownTimeout = 10 * time.Second
 )
 
+// LoadDotEnv loads a .env file from the working directory when one exists.
+func LoadDotEnv() error {
+	return godotenv.Load()
+}
+
 func Load() (Config, error) {
-	_ = godotenv.Load()
+	_ = LoadDotEnv()
 
 	port := 8080
 	if value := os.Getenv("PORT"); value != "" {
