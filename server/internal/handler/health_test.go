@@ -2,10 +2,12 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"backend/internal/response"
 	"backend/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -48,5 +50,13 @@ func TestHealthHandlerReadyWhenDatabaseIsUnavailable(t *testing.T) {
 
 	if recorder.Code != http.StatusServiceUnavailable {
 		t.Fatalf("status = %d, want %d", recorder.Code, http.StatusServiceUnavailable)
+	}
+
+	var body response.Response
+	if err := json.Unmarshal(recorder.Body.Bytes(), &body); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if body.Code != response.CodeServiceUnavailable {
+		t.Fatalf("code = %q, want %q", body.Code, response.CodeServiceUnavailable)
 	}
 }
