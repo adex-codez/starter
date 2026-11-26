@@ -9,6 +9,7 @@ param(
 
 $serverDir = Join-Path $PSScriptRoot "server"
 $scriptsDir = Join-Path $serverDir "scripts"
+$webDir = Join-Path $PSScriptRoot "web"
 
 function Invoke-ServerTask {
     param(
@@ -19,6 +20,21 @@ function Invoke-ServerTask {
     Push-Location $serverDir
     try {
         & (Join-Path $scriptsDir $Script) @Parameters
+        if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+        }
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function Invoke-WebTask {
+    param([string[]]$Arguments)
+
+    Push-Location $webDir
+    try {
+        & pnpm @Arguments
         if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
         }
@@ -42,11 +58,16 @@ Commands:
   migrate-status          Check migration status
   generate                Generate sqlc code
   tidy                    Tidy go modules
+  web-install             Install frontend dependencies (pnpm)
+  web-dev                 Run the frontend dev server
+  web-build               Build the frontend for production
+  web-typecheck           Type-check the frontend
 
 Examples:
   .\task.ps1 build
   .\task.ps1 migrate-new -Name create_users
   .\task.ps1 dev
+  .\task.ps1 web-dev
 "@
 }
 
@@ -60,5 +81,9 @@ switch ($Task) {
     "migrate-status" { Invoke-ServerTask "migrate-status.ps1" }
     "generate"       { Invoke-ServerTask "generate.ps1" }
     "tidy"           { Invoke-ServerTask "tidy.ps1" }
+    "web-install"    { Invoke-WebTask @("install") }
+    "web-dev"        { Invoke-WebTask @("dev") }
+    "web-build"      { Invoke-WebTask @("build") }
+    "web-typecheck"  { Invoke-WebTask @("typecheck") }
     default           { Show-Help }
 }
