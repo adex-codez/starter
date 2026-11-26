@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"backend/internal/repository"
+	"backend/internal/health/repository"
 )
 
 type HealthStatus struct {

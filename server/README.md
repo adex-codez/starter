@@ -57,20 +57,21 @@ The API listens on `http://localhost:8080` by default. The process handles `SIGI
 
 ## Server structure
 
-The server uses a handler, service, and repository structure:
+Feature code is grouped by feature, with separate handler, service, and repository packages:
 
 ```text
-cmd/server             application composition and process lifecycle
-internal/handler       HTTP transport and response mapping
-internal/service       application behavior and use cases
-internal/repository    persistence interfaces and database adapters
+cmd/server                 application composition and process lifecycle
+internal/health/handler   HTTP transport and response mapping for health checks
+internal/health/service   health check behavior
+internal/health/repository persistence interface and PostgreSQL adapter for health checks
+internal/service          shared application errors
 internal/database      database connection setup and generated SQL code
 internal/logging       structured logger construction from environment
 internal/requestid     per-request correlation ID carried in context
 internal/router        route registration and middleware setup
 ```
 
-Dependencies flow from handler to service to repository. The composition point wires concrete adapters together, which keeps HTTP code independent of PostgreSQL and makes each layer replaceable in tests.
+Within a feature, dependencies flow from handler to service to repository. The composition point wires concrete adapters together, which keeps HTTP code independent of PostgreSQL and makes each layer replaceable in tests. Shared application errors live in `internal/service`.
 
 ## Health check
 

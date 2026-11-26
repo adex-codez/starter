@@ -4,9 +4,9 @@ import (
 	"context"
 	"log/slog"
 
+	"backend/internal/health/service"
 	"backend/internal/requestid"
 	"backend/internal/response"
-	"backend/internal/service"
 	"github.com/gin-gonic/gin"
 )
 

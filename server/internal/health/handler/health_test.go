@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"backend/internal/health/service"
 	"backend/internal/response"
-	"backend/internal/service"
 	"github.com/gin-gonic/gin"
 )
 

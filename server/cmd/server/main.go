@@ -9,8 +9,8 @@ import (
 
 	"backend/internal/config"
 	"backend/internal/database"
+	"backend/internal/health/repository"
 	"backend/internal/logging"
-	"backend/internal/repository"
 	"backend/internal/router"
 	"backend/internal/server"
 )

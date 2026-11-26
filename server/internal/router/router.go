@@ -2,10 +2,10 @@ package router
 
 import (
 	"backend/internal/config"
-	"backend/internal/handler"
+	"backend/internal/health/handler"
+	"backend/internal/health/repository"
+	"backend/internal/health/service"
 	"backend/internal/middleware"
-	"backend/internal/repository"
-	"backend/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
